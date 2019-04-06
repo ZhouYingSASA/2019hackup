@@ -1,6 +1,6 @@
-import random, datetime
-from flask import request
-from flask_login import login_user, logout_user, login_required, current_user
+import random
+import datetime
+from flask import request, jsonify
 from . import auth
 from .. import db
 from ..email import send_email
@@ -9,32 +9,30 @@ from ..models import Users
 
 @auth.route('/login', methods=['POST'])  # 登陆路由
 def login():
-    error = None
-    if request.method == 'POST':
+    if Users.query.filter_by(email=request.form['email']).first().confirmed:
         email = request.form['email']
         password = request.form['password']
         user = Users.query.filter_by(email=email).first()
         if email is None:
-            error = "no email"
+            error = 'no email'
             # print(error)
-            return {'error': error}
+            return jsonify({'error': error})
         elif user is None:
-            error = "unknown user"
+            error = 'unknown user'
             # print(error)
-            return {'error': error}
+            return jsonify({'error': error})
         elif user.verify_password(password):
-                login_user(user)
                 # print('login')
                 return user.generate_confirmation_token()
         else:
-            error = "wrong password"
+            error = 'wrong password'
             # print(error)
-            return {'error': error}
-    # print("error")
-    return error
+            return jsonify({'error': error})
+    else:
+        return jsonify({'error': 'not confirmed'})
 
 
-def ver_code():
+def ver_code():  # 生成验证码
     li = []
     for i in range(4):  # 循环4次,生成4个字符
         num = random.randrange(0, 9)
@@ -45,51 +43,61 @@ def ver_code():
 
 @auth.route('/register', methods=['POST', 'GET'])  # 注册路由
 def register():
-    if Users.query.filter_by(email=request.form['email']).all():
-        return {'error': 'email'}
-    elif Users.query.filter_by(username=request.form['username']).all():
-        return {'error': 'username'}
+    if Users.query.filter_by(email=request.form['email']).first():
+        return jsonify({'error': 'email failed'})
+    elif Users.query.filter_by(username=request.form['username']).first():
+        return jsonify({'error': 'username failed'})
     else:
-        user = Users()
         code = ver_code()
 
-        def reg_user():
-            nonlocal user
-            if Users.query.filter_by(email=request.form.['email']):
-                return {'error': 'email failed'}
-            elif Users.query.filter_by(username=request.form['username']):
-                return {'error': 'username failed'}
-            user.email = request.form['email']
-            user.username = request.form['username']
-            user.password = request.form['password']
-            user.code = code
-            user.verify_time = datetime.datetime.now()
         try:
-            reg_user()
+            user = Users(email=request.form['email'], username=request.form['username'],
+                         password=request.form['password'], icon=request.form['icon'], code=code,
+                         verify_time=datetime.datetime.now())
             db.session.add(user)
+            db.session.commit()
         except:
             print('register user failed')
-            return {'error': 'unknown'}
+            return jsonify({'error': 'unknown'}), 500
 
-        db.session.commit()
         try:
-            send_email(user.email, '注册确认邮件', 'auth/email/confirm', user=user, code=code)
+            send_email(user.email, '注册确认邮件', 'auth/email/confirm', user=user, code=user.code)
         except:
             print('send email failed')
-            return {'error': 'fail to send email'}
+            return jsonify({'error': 'fail to send email'})
 
-        return {'status': 1}
+        return jsonify({'status': 1})
 
 
-@auth.route('/confirm/<code>', method='GET')  # 邮箱确认路由
+@auth.route('/confirm/<code>', methods=['POST'])  # 邮箱确认路由
 def confirm(code):
-    if current_user.confirmed:
-        return {'error': 'Already confirmed.'}
-    elif current_user.code != code:
-        return {'error': 'wrong code'}
+    code = int(code)
+    user = Users.query.filter_by(email=request.form['email']).first()
+    if user.confirmed:
+        return jsonify({'error': 'Already confirmed.'})
     else:
+        con = user.confirm(code)
+        if con == 0:
+            return jsonify({'error': 'Timed out'})
+        elif con:
+            return jsonify({'status': 1})
+        else:
+            return jsonify({'error': 'unknown'})
+
+
+@auth.route('/confirm', methods=['POST'])  # 重发验证码路由
+def resend():
+    user = Users.query.filter_by(email=request.form['email']).first()
+    if not user.confirmed:
+        code = ver_code()
+        user.code = code
+        db.session.add(user)
+        db.session.commit()
         try:
-            current_user.confirm()
-            return {'status': 1}
+            send_email(user.email, '注册确认邮件', 'auth/email/confirm', user=user.username, code=user.code)
         except:
-            return {'error': 'unknown'}
+            print('send email failed')
+            return jsonify({'error': 'fail to send email'})
+        return jsonify({'status': 1})
+    else:
+        return jsonify({'error': 'already confirmed'})

@@ -1,5 +1,5 @@
 import datetime
-from . import db, login_manager
+from . import db
 from flask import current_app
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -23,9 +23,16 @@ class Users(UserMixin, db.Model):
         return s.dumps({'confirm': self.email}).decode('utf-8')
 
     def confirm(self, code):  # 验证
-        self.confirmed = True
-        db.session.add(self)
-        return True
+        if self.code == code:
+            if datetime.datetime.now() - self.verify_time <= datetime.timedelta(hours=2):  # 如果验证码未发送2小时
+                self.confirmed = True
+                db.session.add(self)
+                db.session.commit()
+                return True
+            else:
+                return 0
+        else:
+            return False
 
     @property
     def password(self):
@@ -40,8 +47,3 @@ class Users(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.email
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return Users.query.get(int(user_id))

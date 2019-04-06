@@ -15,11 +15,11 @@ login_manager = LoginManager()
 
 def create_app(config_name):
     application = Flask(__name__)
-    bootstrap.init_app(application)
     application.config.from_object(config[config_name])
     config[config_name].init_app(application)
     moment.init_app(application)
     db.init_app(application)
+    mail.init_app(application)
 
     "——注册蓝本——"
     # from .main import main as main_blueprint
