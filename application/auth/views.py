@@ -1,4 +1,3 @@
-import random
 import datetime
 from flask import request, jsonify
 from . import auth
@@ -11,26 +10,32 @@ from ..models import Users
 def login():
     data = {}
     status = 0
-    if Users.query.filter_by(username=request.form['username']).first().confirmed:
-        username = request.form['username']
-        password = request.form['password']
-        user = Users.query.filter_by(username=username).first()
-        if username is None:
-            message = 'no email'
-            # print(message)
-        elif user is None:
-            message = 'unknown user'
-            # print(message)
-        elif user.verify_password(password):
-            data['token'] = user.generate_confirmation_token()
-            message = 'success'
-            status = 1
-            # print(message)
+    if request.form['password']:
+        if Users.query.filter_by(username=request.form['username']).first().confirmed:
+            username = request.form['username']
+            password = request.form['password']
+            user = Users.query.filter_by(username=username).first()
+            if username is None:
+                message = 'no email'
+                # print(message)
+            elif user is None:
+                message = 'unknown user'
+                # print(message)
+            elif user.verify_password(password):
+                data['token'] = user.generate_confirmation_token()
+                message = 'success'
+                status = 1
+                # print(message)
+            else:
+                message = 'wrong password'
+                # print(message)
         else:
-            message = 'wrong password'
-            # print(message)
+            message = 'not confirmed'
     else:
-        message = 'not confirmed'
+        if Users.query.filter_by(username=request.form['username']).first():
+            message = 'success'
+        else:
+            message = 'unknown user'
     return jsonify({
         'data': data,
         'message': message,
@@ -38,13 +43,37 @@ def login():
     })
 
 
-def ver_code():  # 生成验证码
-    li = []
-    for i in range(4):  # 循环4次,生成4个字符
-        num = random.randrange(0, 9)
-        li.append(str(num))
-    r_code = ''.join(li)  # 6个字符拼接为字符串
-    return r_code  # 返回字符串
+@auth.route('/password', methods=['POST'])  # 修改密码
+def get_email():
+    data = {}
+    status = 0
+    user = Users.query.filter_by(username=request.form['username']).first()
+    if user.email == request.form['email']:
+        user.password = request.form['password']
+        db.session.commit()
+        message = 'success'
+    else:
+        message = 'wrong email'
+    return jsonify({
+        'data': data,
+        'message': message,
+        'status': status
+    })
+
+
+@auth.route('/forget', methods=['POST'])  # 忘记密码
+def forget():
+    data = {}
+    status = 0
+    username = request.form['username']
+    user = Users.query.filter_by(username=username)
+    if user.email == request.form['email']:
+        user.confirm(request.form['code'], password=request.form['password'])
+    return jsonify({
+        'data': data,
+        'message': message,
+        'status': status
+    })
 
 
 @auth.route('/register', methods=['POST', 'GET'])  # 注册路由
@@ -56,9 +85,8 @@ def register():
     elif Users.query.filter_by(username=request.form['username']).first():
         message = 'username failed'
     else:
-        code = ver_code()
-
         try:
+            code = ver_code()
             user = Users(email=request.form['email'], username=request.form['username'],
                          password=request.form['password'], icon=request.form['icon'], code=code,
                          verify_time=datetime.datetime.now())
@@ -108,12 +136,9 @@ def resend():
     status = 0
     user = Users.query.filter_by(email=request.form['email']).first()
     if not user.confirmed:
-        code = ver_code()
-        user.code = code
-        db.session.add(user)
-        db.session.commit()
+        code = user.ver_code()
         try:
-            send_email(user.email, '注册确认邮件', 'auth/email/confirm', user=user.username, code=user.code)
+            send_email(user.email, '注册确认邮件', 'auth/email/confirm', user=user.username, code=code)
             status = 1
             message = 'success'
         except:
@@ -126,3 +151,12 @@ def resend():
         'message': message,
         'status': status
     })
+
+
+def ver_code():  # 生成验证码
+    li = []
+    for i in range(4):  # 循环4次,生成4个字符
+        num = random.randrange(0, 9)
+        li.append(str(num))
+    r_code = int(''.join(li))  # 拼接为字符串并转化为int
+    return r_code  # 返回code
