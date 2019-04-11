@@ -1,4 +1,4 @@
-&npsb;
+&nbsp;
 
 **登陆路由**：
 
@@ -16,9 +16,9 @@
 
 用户未确认：返回<code>{'message': 'not confirmed'}</code>
 
-&npsb;
+&nbsp;
 
-&npsb;
+&nbsp;
 
 **忘记密码**：
 
@@ -32,9 +32,9 @@
 
 用户不存在：返回 <code>{'message': 'unknown user'}</code>
 
-&npsb;
+&nbsp;
 
-&npsb;
+&nbsp;
 
 **注册路由**:
 
@@ -60,9 +60,9 @@
 未知错误：返回
 <code>{'message': 'unknown'}</code>
 
-&npsb;
+&nbsp;
 
-&npsb;
+&nbsp;
 
 **确认邮箱**：
 
@@ -82,9 +82,9 @@
 验证码超时：返回
 <code>{'message': 'Timed out'}</code>
 
-&npsb;
+&nbsp;
 
-&npsb;
+&nbsp;
 
 **重发验证码**：
 
@@ -101,6 +101,6 @@
 用户已确认过：返回
 <code>{'message': 'Already confirmed'}</code>
 
-&npsb;
+&nbsp;
 
 (错误下status均为0)
