@@ -20,6 +20,22 @@
 
 &nbsp;
 
+**更改头像**:
+
+```/auth/chic```
+
+方法：POST
+
+传入：
+<code>username, icon</code>
+
+更改成功：返回
+<code>{‘message’: 'success', 'status': 1}</code>
+
+&nbsp;
+
+&nbsp;
+
 **忘记密码**：
 
 ```/auth/login```

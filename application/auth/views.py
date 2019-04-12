@@ -44,6 +44,18 @@ def login():
     })
 
 
+@auth.route('/chic', methods=['POST'])  # 更改头像
+def chic():
+    user = Users.query.filter_by(username=request.form['username']).first()
+    user.icon = request.form['icon']
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({
+        'message': 'success',
+        'status': 1
+    })
+
+
 @auth.route('/password', methods=['POST'])  # 修改密码
 def get_email():
     data = {}
@@ -72,7 +84,7 @@ def forget():
         user.confirm(request.form['code'], password=request.form['password'])
     return jsonify({
         'data': data,
-        'message': message,
+        'message': 'ok',
         'status': status
     })
 
