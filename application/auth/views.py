@@ -24,6 +24,7 @@ def login():
                 # print(message)
             elif user.verify_password(password):
                 data['token'] = user.generate_confirmation_token()
+                data['icon'] = user.icon
                 message = 'success'
                 status = 1
                 # print(message)
