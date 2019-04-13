@@ -69,7 +69,7 @@ def register():
         try:
             code = ver_code()
             user = Users(email=request.form['email'], username=request.form['username'],
-                         password=request.form['password'], icon=request.form['icon'], code=code,
+                         code=code, icon=request.form['icon'], password=request.form['password'],
                          verify_time=datetime.datetime.now())
             db.session.add(user)
             db.session.commit()
@@ -173,7 +173,7 @@ def get_email():
     })
 
 
-@auth.route('/password', mothods=['POST'])  # 修改密码
+@auth.route('/password', methods=['POST'])  # 修改密码
 def change_password():
     pass
 
