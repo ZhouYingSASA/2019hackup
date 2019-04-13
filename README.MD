@@ -85,7 +85,9 @@ email冲突：返回<code>{'message': 'exist'}</code>
 
 ```/auth/confirm/<code>```
 
-方法:GET
+方法:POST
+
+传入：<code>email, code</code>
 
 确认成功：返回
 <code>{'message': 'success', 'status': 1}</code>

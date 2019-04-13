@@ -102,11 +102,11 @@ def register():
     })
 
 
-@auth.route('/con/<code>', methods=['GET'])  # 邮箱确认路由
-def confirm(code):
+@auth.route('/con', methods=['POST'])  # 邮箱确认路由
+def confirm():
     data = {}
     status = 0
-    code = int(code)
+    code = int(request.form['code'])
     user = Users.query.filter_by(email=request.form['email']).first()
     if user.confirmed:
         message = 'Already confirmed.'
