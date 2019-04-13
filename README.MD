@@ -64,7 +64,7 @@
 
 &nbsp;
 
-**验证邮箱不存在**：
+**邮箱-用户名检测**：
 
 ```/auth/is_exist```
 
@@ -75,7 +75,7 @@
 
 email未注册过：返回<code>{'message': 'ok', 'status': 1}</code>
 
-email冲突：返回<code>{'message': 'exist'}</code>
+email存在：返回<code>{'message': username}</code>
 
 &nbsp;
 

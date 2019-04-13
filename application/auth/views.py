@@ -45,15 +45,16 @@ def login():
     })
 
 
-@auth.route('/is_exist', methods=['POST'])  # 邮箱未注册过
+@auth.route('/is_exist', methods=['POST'])  # 邮箱-用户名检测
 def is_exist():
     status = 0
     email = request.form['email']
-    if not Users.query.filter_by(email=email).first():
+    user = Users.query.filter_by(email=email).first()
+    if not user:
         message = 'ok'
         status = 1
     else:
-        message = 'exist'
+        message = user.username
     return jsonify({
         'message': message,
         'status': status
