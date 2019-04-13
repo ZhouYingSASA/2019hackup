@@ -111,26 +111,6 @@ def confirm(code):
     })
 
 
-@auth.route('/confirm', methods=['POST'])  # 重发验证码路由
-def resend():
-    data = {}
-    status = 0
-    user = Users.query.filter_by(email=request.form['email']).first()
-    code = user.ver_code()
-    try:
-        send_email(user.email, '注册确认邮件', 'auth/email/confirm', user=user.username, code=code)
-        status = 1
-        message = 'success'
-    except:
-        print('send email failed')
-        message = 'fail to send email'
-    return jsonify({
-        'data': data,
-        'message': message,
-        'status': status
-    })
-
-
 @auth.route('/forget', methods=['POST'])  # 忘记密码(发送验证码)
 def forget():
     data = {}
@@ -160,7 +140,7 @@ def get_email():
     if user.email == request.form['email']:
         is_code = user.confirm(request.form['code'])
         if is_code:
-            data['token'] = user.generate_confirmation_token
+            data['token'] = user.generate_confirmation_token()
             message = 'success'
         elif is_code == 0:
             message = 'Timed out'
@@ -175,7 +155,42 @@ def get_email():
 
 @auth.route('/password', methods=['POST'])  # 修改密码
 def change_password():
-    pass
+    status = 0
+    user = Users.query.filter_by(email=request.form['email']).first()
+    if user:
+        if user.verify_confirmation_token(request.form['token']):
+            user.password = request.form['password']
+            db.session.commit()
+            message = 'success'
+            status = 1
+        else:
+            message = 'token failed'
+    else:
+        message = 'unknown user'
+    return jsonify({
+        'message': message,
+        'status': status
+    })
+
+
+@auth.route('/confirm', methods=['POST'])  # 重发验证码路由
+def resend():
+    data = {}
+    status = 0
+    user = Users.query.filter_by(email=request.form['email']).first()
+    code = user.ver_code()
+    try:
+        send_email(user.email, '注册确认邮件', 'auth/email/confirm', user=user.username, code=code)
+        status = 1
+        message = 'success'
+    except:
+        print('send email failed')
+        message = 'fail to send email'
+    return jsonify({
+        'data': data,
+        'message': message,
+        'status': status
+    })
 
 
 def ver_code():  # 生成验证码

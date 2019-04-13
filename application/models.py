@@ -21,7 +21,17 @@ class Users(UserMixin, db.Model):
 
     def generate_confirmation_token(self, expiration=3000):  # 生成token
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'confirm': self.email}).decode('utf-8')
+        return s.dumps({'email': self.email}).decode('utf-8')
+
+    def verify_confirmation_token(self, token):  # 解析token
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return False
+        if data.get('email') != self.email:
+            return False
+        return True
 
     def confirm(self, code, **kwargs):  # 验证
         if self.code == code:

@@ -120,11 +120,31 @@
 
 &nbsp;
 
+**修改密码**:
+
+```/auth/password```
+
+方法：POST
+
+传入：<code>email, token, password</code>
+
+修改成功：返回<code>{'message': 'success', 'status': 1}</code>
+
+email不存在：返回<code>{'message': 'unknown user'}</code>
+
+token错误：返回<code>{'message': 'token failed'}</code>
+
+&nbsp;
+
+&nbsp;
+
 **重发验证码**：
 
 ```/auth/confirm```
 
 方法：POST
+
+传入：<code>email,</code>
 
 重发成功：返回
 <code>{'message': 'success', 'status': 1} </code>
