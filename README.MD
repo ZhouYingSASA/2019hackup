@@ -163,7 +163,7 @@ token错误：返回<code>{'message': 'token failed'}</code>
 
 方法：POST
 
-传入：<code>email,</code>
+传入：<code>email, code</code>
 
 重发成功：返回
 <code>{'message': 'success', 'status': 1} </code>
