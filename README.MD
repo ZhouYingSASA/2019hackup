@@ -8,7 +8,7 @@
 
 传入：<code>username, password</code>
 
-登陆成功：返回<code>{'data': token, 'status':1}</code>
+登陆成功：返回<code>{'data': token, 'icon': icon 'status':1}</code>
 
 不存在用户：返回 <code>{'message' : 'unknown user'}</code>
 
@@ -31,22 +31,6 @@
 
 更改成功：返回
 <code>{‘message’: 'success', 'status': 1}</code>
-
-&nbsp;
-
-&nbsp;
-
-**忘记密码**：
-
-```/auth/forget```
-
-方法：POST
-
-传入：<code>username, email</code>
-
-用户存在：返回 <code>{'data': email}</code>
-
-用户不存在：返回 <code>{'message': 'unknown user'}</code>
 
 &nbsp;
 
@@ -84,7 +68,7 @@
 
 ```/auth/confirm/<code>```
 
-方法:POST
+方法:GET
 
 确认成功：返回
 <code>{'message': 'success', 'status': 1}</code>
@@ -102,9 +86,43 @@
 
 &nbsp;
 
+**忘记密码(发送验证码)**：
+
+```/auth/forget```
+
+方法：POST
+
+传入：<code>username, email</code>
+
+已发送验证码：返回 <code>{'data': 'success', 'status': 1}</code>
+
+用户邮箱不存在：返回 <code>{'message': 'not match'}</code>
+
+&nbsp;
+
+&nbsp;
+
+**忘记密码(确认验证码)**：
+
+```/auth/code```
+
+方法：POST
+
+传入：<code>username, email, code</code>
+
+验证码正确：返回 <code>{'data': token, 'message': 'success', 'status': 1}</code>
+
+用户邮箱不匹配：返回 <code>{'message': 'not match'}</code>
+
+验证码过期：返回<code>{'message': 'Timed out', 'status': 0}</code>
+
+&nbsp;
+
+&nbsp;
+
 **重发验证码**：
 
-```/auth/confirm</code>```
+```/auth/confirm```
 
 方法：POST
 
@@ -113,9 +131,6 @@
 
 发送邮件失败：返回
 <code>{'message': 'failed to send email'} </code>
-
-用户已确认过：返回
-<code>{'message': 'Already confirmed'}</code>
 
 &nbsp;
 

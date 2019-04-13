@@ -57,28 +57,6 @@ def chic():
     })
 
 
-@auth.route('/password', methods=['POST'])  # 修改密码
-def get_email():
-    data = {}
-    message = ''
-    status = 0
-    user = Users.query.filter_by(username=request.form['username']).first()
-    if user.email == request.form['email']:
-        is_code = user.confirm(request.form['code'])
-        if is_code:
-            user.password(request.form['password'])
-            message = 'success'
-        elif is_code == 0:
-            message = 'Timed out'
-    else:
-        message = 'not match'
-    return jsonify({
-        'data': data,
-        'message': message,
-        'status': status
-    })
-
-
 @auth.route('/register', methods=['POST', 'GET'])  # 注册路由
 def register():
     data = {}
@@ -138,17 +116,14 @@ def resend():
     data = {}
     status = 0
     user = Users.query.filter_by(email=request.form['email']).first()
-    if not user.confirmed:
-        code = user.ver_code()
-        try:
-            send_email(user.email, '注册确认邮件', 'auth/email/confirm', user=user.username, code=code)
-            status = 1
-            message = 'success'
-        except:
-            print('send email failed')
-            message = 'fail to send email'
-    else:
-        message = 'already confirmed'
+    code = user.ver_code()
+    try:
+        send_email(user.email, '注册确认邮件', 'auth/email/confirm', user=user.username, code=code)
+        status = 1
+        message = 'success'
+    except:
+        print('send email failed')
+        message = 'fail to send email'
     return jsonify({
         'data': data,
         'message': message,
@@ -164,7 +139,7 @@ def forget():
     user = Users.query.filter_by(username=username)
     if user.email == request.form['email']:
         code = user.ver_code()
-        send_email(user.email,'确认验证码', 'auth/email/confirm', user=user, code=code)
+        send_email(user.email, '确认验证码', 'auth/email/confirm', user=user, code=code)
         message = 'success'
         status = 1
     else:
@@ -174,6 +149,33 @@ def forget():
         'message': message,
         'status': status
     })
+
+
+@auth.route('/code', methods=['POST'])  # 忘记密码(确认验证码)
+def get_email():
+    data = {}
+    message = ''
+    status = 0
+    user = Users.query.filter_by(username=request.form['username']).first()
+    if user.email == request.form['email']:
+        is_code = user.confirm(request.form['code'])
+        if is_code:
+            data['token'] = user.generate_confirmation_token
+            message = 'success'
+        elif is_code == 0:
+            message = 'Timed out'
+    else:
+        message = 'not match'
+    return jsonify({
+        'data': data,
+        'message': message,
+        'status': status
+    })
+
+
+@auth.route('/password', mothods=['POST'])  # 修改密码
+def change_password():
+    pass
 
 
 def ver_code():  # 生成验证码
