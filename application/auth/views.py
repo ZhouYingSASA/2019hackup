@@ -49,7 +49,7 @@ def login():
 def is_exist():
     status = 0
     email = request.form['email']
-    if not Users.query.filter_by(email=email):
+    if not Users.query.filter_by(email=email).first():
         message = 'ok'
         status = 1
     else:
