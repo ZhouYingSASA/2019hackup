@@ -102,7 +102,7 @@ def register():
     })
 
 
-@auth.route('/confirm/<code>', methods=['GET'])  # 邮箱确认路由
+@auth.route('/con/<code>', methods=['GET'])  # 邮箱确认路由
 def confirm(code):
     data = {}
     status = 0
