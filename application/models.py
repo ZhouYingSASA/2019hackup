@@ -62,6 +62,8 @@ class Users(UserMixin, db.Model):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
+        db.session.add(self)
+        db.session.commit()
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)

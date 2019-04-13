@@ -38,11 +38,11 @@
 
 **忘记密码**：
 
-```/auth/login```
+```/auth/forget```
 
 方法：POST
 
-传入：<code>username_g</code>
+传入：<code>username, email</code>
 
 用户存在：返回 <code>{'data': email}</code>
 

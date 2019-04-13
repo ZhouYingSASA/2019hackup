@@ -60,32 +60,21 @@ def chic():
 @auth.route('/password', methods=['POST'])  # 修改密码
 def get_email():
     data = {}
+    message = ''
     status = 0
     user = Users.query.filter_by(username=request.form['username']).first()
     if user.email == request.form['email']:
-        user.password = request.form['password']
-        db.session.commit()
-        message = 'success'
+        is_code = user.confirm(request.form['code'])
+        if is_code:
+            user.password(request.form['password'])
+            message = 'success'
+        elif is_code == 0:
+            message = 'Timed out'
     else:
-        message = 'wrong email'
+        message = 'not match'
     return jsonify({
         'data': data,
         'message': message,
-        'status': status
-    })
-
-
-@auth.route('/forget', methods=['POST'])  # 忘记密码
-def forget():
-    data = {}
-    status = 0
-    username = request.form['username']
-    user = Users.query.filter_by(username=username)
-    if user.email == request.form['email']:
-        user.confirm(request.form['code'], password=request.form['password'])
-    return jsonify({
-        'data': data,
-        'message': 'ok',
         'status': status
     })
 
@@ -120,7 +109,7 @@ def register():
     })
 
 
-@auth.route('/confirm/<code>', methods=['POST'])  # 邮箱确认路由
+@auth.route('/confirm/<code>', methods=['GET'])  # 邮箱确认路由
 def confirm(code):
     data = {}
     status = 0
@@ -160,6 +149,26 @@ def resend():
             message = 'fail to send email'
     else:
         message = 'already confirmed'
+    return jsonify({
+        'data': data,
+        'message': message,
+        'status': status
+    })
+
+
+@auth.route('/forget', methods=['POST'])  # 忘记密码(发送验证码)
+def forget():
+    data = {}
+    status = 0
+    username = request.form['username']
+    user = Users.query.filter_by(username=username)
+    if user.email == request.form['email']:
+        code = user.ver_code()
+        send_email(user.email,'确认验证码', 'auth/email/confirm', user=user, code=code)
+        message = 'success'
+        status = 1
+    else:
+        message = "not match"
     return jsonify({
         'data': data,
         'message': message,
