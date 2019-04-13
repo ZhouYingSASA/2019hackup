@@ -11,11 +11,11 @@ from ..models import Users
 def login():
     data = {}
     status = 0
+    user = Users.query.filter_by(username=request.form['username']).first()
     if request.form['password']:
-        if Users.query.filter_by(username=request.form['username']).first().confirmed:
+        if user.confirmed:
             username = request.form['username']
             password = request.form['password']
-            user = Users.query.filter_by(username=username).first()
             if username is None:
                 message = 'no email'
                 # print(message)
@@ -34,8 +34,9 @@ def login():
         else:
             message = 'not confirmed'
     else:
-        if Users.query.filter_by(username=request.form['username']).first():
+        if user:
             message = 'success'
+            data['icon'] = user.icon
         else:
             message = 'unknown user'
     return jsonify({
@@ -66,7 +67,7 @@ def get_email():
     status = 0
     message = 'fail'
     user = Users.query.filter_by(email=request.form['username'])
-    if user.email==request.form['email']:
+    if user.email == request.form['email']:
         message = 'success'
         status = 1
     return jsonify({
