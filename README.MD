@@ -64,6 +64,23 @@
 
 &nbsp;
 
+**验证邮箱不存在**：
+
+```/auth/is_exist```
+
+方法：POST
+
+传入：
+<code>email</code>
+
+email未注册过：返回<code>{'message': 'ok', 'status': 1}</code>
+
+email冲突：返回<code>{'message': 'exist'}</code>
+
+&nbsp;
+
+&nbsp;
+
 **确认邮箱**：
 
 ```/auth/confirm/<code>```

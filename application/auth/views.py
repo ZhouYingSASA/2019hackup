@@ -45,6 +45,21 @@ def login():
     })
 
 
+@auth.route('/is_exist', methods=['POST'])  # 邮箱未注册过
+def is_exist():
+    status = 0
+    email = request.form['email']
+    if not Users.query.filter_by(email=email):
+        message = 'ok'
+        status = 1
+    else:
+        message = 'exist'
+    return jsonify({
+        'message': message,
+        'status': status
+    })
+
+
 @auth.route('/chic', methods=['POST'])  # 更改头像
 def chic():
     user = Users.query.filter_by(username=request.form['username']).first()
