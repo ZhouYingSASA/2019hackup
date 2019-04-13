@@ -33,10 +33,10 @@ class Users(UserMixin, db.Model):
             return False
         return True
 
-    def confirm(self, code, **kwargs):  # 验证
+    def confirm(self, code, password=''):  # 验证
         if self.code == code:
             if datetime.datetime.now() - self.verify_time < datetime.timedelta(hours=2):  # 如果验证码未发送2小时
-                if kwargs['password']:
+                if password:
                     self.password_hash = self.password(kwargs['password'])  # 修改密码
                 elif not self.confirmed:
                     self.confirmed = True
