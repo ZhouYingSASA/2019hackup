@@ -45,7 +45,7 @@ def login():
     })
 
 
-@auth.route('/is_exist', methods=['POST'])  # 邮箱-用户名检测
+@auth.route('/is_exist', methods=['POST'])  # 邮箱检测
 def is_exist():
     status = 0
     email = request.form['email']
@@ -54,11 +54,29 @@ def is_exist():
         message = 'ok'
         status = 1
     else:
-        message = user.username
+        message = 'exist'
     return jsonify({
         'message': message,
         'status': status
     })
+
+
+@auth.route('/email', methods=['POST'])
+def get_email():
+    data = {}
+    status = 0
+    message = 'fail'
+    user = Users.query.filter_by(email=request.form['username'])
+    if user:
+        data['email'] = user.email
+        message = 'success'
+        status = 1
+    return jsonify({
+        'data': data,
+        'message': message,
+        'status': status
+    })
+
 
 
 @auth.route('/chic', methods=['POST'])  # 更改头像
