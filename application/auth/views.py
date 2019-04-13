@@ -61,22 +61,18 @@ def is_exist():
     })
 
 
-@auth.route('/email', methods=['POST'])
+@auth.route('/email', methods=['POST'])  # 用户名=>邮箱匹配
 def get_email():
-    data = {}
     status = 0
     message = 'fail'
     user = Users.query.filter_by(email=request.form['username'])
-    if user:
-        data['email'] = user.email
+    if user.email==request.form['email']:
         message = 'success'
         status = 1
     return jsonify({
-        'data': data,
         'message': message,
         'status': status
     })
-
 
 
 @auth.route('/chic', methods=['POST'])  # 更改头像

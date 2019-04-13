@@ -81,16 +81,16 @@ email存在：返回<code>{'message': 'exist'}</code>
 
 &nbsp;
 
-**获取email**：
+**用户名、邮箱匹配**：
 
 ```/auth/email```
 
 传入：
-<code>username</code>
+<code>username, email</code>
 
-存在：返回<code>{'data': email, 'message': 'success', 'status': 1}</code>
+匹配：返回<code>{'message': 'success', 'status': 1}</code>
 
-不存在：返回<code>{'message': 'fail'}</code>
+不匹配：返回<code>{'message': 'fail'}</code>
 
 &nbsp;
 
