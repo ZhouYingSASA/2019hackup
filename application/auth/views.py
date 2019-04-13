@@ -166,7 +166,7 @@ def forget():
 
 
 @auth.route('/code', methods=['POST'])  # 忘记密码(确认验证码)
-def get_email():
+def verify_code():
     data = {}
     message = ''
     status = 0
