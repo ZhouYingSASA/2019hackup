@@ -61,7 +61,6 @@ class Users(UserMixin, db.Model):
         r_code = ''.join(li)  # 拼接为字符串并转化为int
         self.code = r_code
         self.verify_time = datetime.datetime.now()
-        db.session.add(self)
         db.session.commit()
         return r_code  # 返回字符串
 
