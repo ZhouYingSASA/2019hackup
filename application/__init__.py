@@ -25,6 +25,6 @@ def create_app(config_name):
     # from .main import main as main_blueprint
     # application.register_blueprint(main_blueprint)
     from .auth import auth as auth_blueprint
-    application.register_blueprint(auth_blueprint, url_prefix='/auth')
+    application.register_blueprint(auth_blueprint, url_prefix='/api/auth')
 
     return application
