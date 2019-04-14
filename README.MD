@@ -90,7 +90,9 @@ email存在：返回<code>{'message': 'exist'}</code>
 
 匹配：返回<code>{'message': 'success', 'status': 1}</code>
 
-不匹配：返回<code>{'message': 'fail'}</code>
+不匹配：返回<code>{'message': 'fail'}</code>'
+
+不存在用户：返回<code>{'message': 'unknown user'}</code>
 
 &nbsp;
 

@@ -146,15 +146,17 @@ def confirm():
 def forget():
     data = {}
     status = 0
+    message = 'unknown user'
     username = request.form['username']
     user = Users.query.filter_by(username=username).first()
-    if user.email == request.form['email']:
-        code = user.ver_code()
-        send_email(user.email, '确认验证码', 'auth/email/confirm', user=user, code=code)
-        message = 'success'
-        status = 1
-    else:
-        message = "not match"
+    if user:
+        if user.email == request.form['email']:
+            code = user.ver_code()
+            send_email(user.email, '确认验证码', 'auth/email/confirm', user=user, code=code)
+            message = 'success'
+            status = 1
+        else:
+            message = "not match"
     return jsonify({
         'data': data,
         'message': message,
