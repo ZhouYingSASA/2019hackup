@@ -66,7 +66,7 @@ def is_exist():
 def get_email():
     status = 0
     message = 'fail'
-    user = Users.query.filter_by(email=request.form['username'])
+    user = Users.query.filter_by(email=request.form['username']).first()
     if user.email == request.form['email']:
         message = 'success'
         status = 1
