@@ -122,17 +122,20 @@ def register():
 def confirm():
     data = {}
     status = 0
-    code = int(request.form['code'])
+    code = request.form['code']
     user = Users.query.filter_by(email=request.form['email']).first()
     if user.confirmed:
         message = 'Already confirmed.'
     else:
         con = user.confirm(code)
-        if con == 0:
+        print(con)
+        if con == 2:
             message = 'Timed out'
         elif con:
             message = 'success'
             status = 1
+        elif not con:
+            message = 'wrong code'
         else:
             message = 'unknown'
     return jsonify({
@@ -174,7 +177,7 @@ def verify_code():
         if is_code:
             data['token'] = user.generate_confirmation_token()
             message = 'success'
-        elif is_code == 0:
+        elif is_code == 2:
             message = 'Timed out'
     else:
         message = 'not match'

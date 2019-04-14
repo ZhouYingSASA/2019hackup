@@ -37,11 +37,10 @@ class Users(UserMixin, db.Model):
         if self.code == code:
             if datetime.datetime.now() - self.verify_time < datetime.timedelta(hours=2):  # 如果验证码未发送2小时
                 if password:
-                    self.password_hash = self.password(kwargs['password'])  # 修改密码
+                    self.password_hash = self.password = password  # 修改密码
                 elif not self.confirmed:
                     self.confirmed = True
                     self.verify_time -= datetime.timedelta(hours=2)  # 验证码用后过期
-                    db.session.add(self)
                     db.session.commit()
                     return True
                 else:
@@ -49,7 +48,7 @@ class Users(UserMixin, db.Model):
                     return 1
             else:
                 # Timed out
-                return 0
+                return 2
         else:
             return False
 
