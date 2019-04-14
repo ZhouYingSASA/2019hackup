@@ -100,7 +100,7 @@ email存在：返回<code>{'message': 'exist'}</code>
 
 **确认邮箱**：
 
-```/auth/confirm/<code>```
+```/auth/con```
 
 方法:POST
 
