@@ -66,7 +66,7 @@ def is_exist():
 def get_email():
     status = 0
     message = 'fail'
-    user = Users.query.filter_by(email=request.form['username']).first()
+    user = Users.query.filter_by(username=request.form['username']).first()
     if user.email == request.form['email']:
         message = 'success'
         status = 1
@@ -149,14 +149,13 @@ def forget():
     message = 'unknown user'
     username = request.form['username']
     user = Users.query.filter_by(username=username).first()
-    if user:
-        if user.email == request.form['email']:
-            code = user.ver_code()
-            send_email(user.email, '确认验证码', 'auth/email/confirm', user=user, code=code)
-            message = 'success'
-            status = 1
-        else:
-            message = "not match"
+    if user.email == request.form['email']:
+        code = user.ver_code()
+        send_email(user.email, '确认验证码', 'auth/email/confirm', user=user, code=code)
+        message = 'success'
+        status = 1
+    else:
+        message = "not match"
     return jsonify({
         'data': data,
         'message': message,
