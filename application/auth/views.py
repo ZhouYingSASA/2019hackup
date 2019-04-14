@@ -225,10 +225,17 @@ def resend():
     })
 
 
+@auth.route('/pass', methods=['POST'])
+def level_pass():
+    status = 0
+    username = request.form['username']
+    token = request.form['token']
+
+
 def ver_code():  # 生成验证码
     li = []
     for i in range(4):  # 循环4次,生成4个字符
         num = random.randrange(0, 9)
         li.append(str(num))
-    r_code = int(''.join(li))  # 拼接为字符串并转化为int
+    r_code = ''.join(li)  # 拼接为字符串
     return r_code  # 返回code

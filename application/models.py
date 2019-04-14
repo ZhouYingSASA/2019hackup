@@ -16,7 +16,7 @@ class Users(UserMixin, db.Model):
     confirmed = db.Column(db.Boolean, default=False)
     passed = db.Column(db.Integer, default=0)
     icon = db.Column(db.SmallInteger, nullable=False)
-    code = db.Column(db.SmallInteger)
+    code = db.Column(db.String(4))
     verify_time = db.Column(db.DateTime, default=datetime.datetime.now())
 
     def generate_confirmation_token(self, expiration=3000):  # 生成token
@@ -58,7 +58,7 @@ class Users(UserMixin, db.Model):
         for i in range(4):  # 循环4次,生成4个字符
             num = random.randrange(0, 9)
             li.append(str(num))
-        r_code = int(''.join(li))  # 拼接为字符串并转化为int
+        r_code = ''.join(li)  # 拼接为字符串并转化为int
         self.code = r_code
         self.verify_time = datetime.datetime.now()
         db.session.add(self)
