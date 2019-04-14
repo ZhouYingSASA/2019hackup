@@ -149,7 +149,6 @@ def confirm():
 def forget():
     data = {}
     status = 0
-    message = 'unknown user'
     username = request.form['username']
     user = Users.query.filter_by(username=username).first()
     if user.email == request.form['email']:
@@ -228,11 +227,19 @@ def resend():
     })
 
 
-@auth.route('/pass', methods=['POST'])
+@auth.route('/pass', methods=['POST'])  # 过关接口
 def level_pass():
     status = 0
     username = request.form['username']
     token = request.form['token']
+    level = request.form['level']
+    user = Users.query.filter_by(username=username).first()
+    if user.verify_confirmation_token(token):
+        user.passed = level
+        status = 1
+    return jsonify({
+        'status': status
+    })
 
 
 def ver_code():  # 生成验证码
